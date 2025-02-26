@@ -13,18 +13,6 @@
                     > Triを含める
                 </label>
                 </div>
-                <div class="setting-item">
-                <label>
-                    デッドカード数:
-                    <input 
-                    type="number" 
-                    v-model.number="deadCards"
-                    min="0"
-                    max="46"
-                    class="dead-cards-input"
-                    >
-                </label>
-                </div>
             </div>
         <div class="input-group">
           <input 
@@ -81,7 +69,6 @@ export default defineComponent({
   data() {
     return {
       showTri: false,
-      deadCards: 3,
       labels: BADUGI_LABELS,
       rangeInput: '',
       selectedHands: [] as string[],
@@ -139,7 +126,7 @@ export default defineComponent({
       this.selectedHands = parseRange(this.rangeInput);
     },
     calculateBadugiOddsList(): Map<string, number> {
-      return calculateBadugiOdds(this.selectedHands, this.deadCards, this.showTri);
+      return calculateBadugiOdds(this.selectedHands, this.showTri);
     }
   }
 })

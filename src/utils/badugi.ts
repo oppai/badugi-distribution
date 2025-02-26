@@ -64,12 +64,12 @@ export function parseRange(rangeStr: string): string[] {
 }
 
 // バドゥギの確率を計算
-export function calculateBadugiOdds(hands: string[], deadCards: number = 3, showTri: boolean = false): Map<string, number> {
+export function calculateBadugiOdds(hands: string[], showTri: boolean = false): Map<string, number> {
   if (hands.length == 0) {
     return new Map<string, number>();
   }
 
-  const remainingCards = 52 - 3 - deadCards; // 3は選択された3枚
+  const remainingCards = 52 - 3; // 3は選択された3枚
   const remainingTri = remainingCards - 10; // Badugiは10アウツ
   const outs = new Map<string, number>();
   for (const hand of hands) {
@@ -77,7 +77,9 @@ export function calculateBadugiOdds(hands: string[], deadCards: number = 3, show
     const lastRankIndex = RANK_ORDER[lastRank as Rank];
     for (let label of BADUGI_LABELS) {
       const current = outs.get(label) || 0;
-      if (label == 'Tri' && showTri) {
+      if (label == 'Tri' && !showTri) {
+        continue
+      } else if (label == 'Tri' && showTri) {
         outs.set(label, current + remainingTri);
       } else if (RANK_ORDER[label as Rank] < lastRankIndex) {
         outs.set(label, current);
