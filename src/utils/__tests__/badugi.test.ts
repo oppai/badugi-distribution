@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, suite, expect } from 'vitest'
 import { parseRange, calculateBadugiOdds, ALL_VALID_HANDS } from '../badugi'
 describe('ALL_VALID_HANDS', () => {
   it('数が正しい', () => {
@@ -46,11 +46,16 @@ describe('parseRange', () => {
 });
 
 describe('calculateBadugiOdds', () => {
-  it('デフォルトのデッドカード数で確率を計算できる', () => {
-    expect(calculateBadugiOdds(['A23']).get('4')).toBeCloseTo(1/46);
+  it('Triを表示しない場合', () => {
+    const odds = calculateBadugiOdds(['A23'], false);
+    expect(odds.get('4')).toBeCloseTo(10.0);
+    expect(odds.get('5')).toBeCloseTo(10.0);
+    expect(odds.get('6')).toBeCloseTo(10.0);
   });
-
-  it('カスタムのデッドカード数で確率を計算できる', () => {
-    expect(calculateBadugiOdds(['A23'], 5).get('4')).toBeCloseTo(1/44);
+  it('Triを表示する場合', () => {
+    const odds = calculateBadugiOdds(['A23'], true);
+    expect(odds.get('4')).toBeCloseTo(1/49 * 100);
+    expect(odds.get('5')).toBeCloseTo(1/49 * 100);
+    expect(odds.get('Tri')).toBeCloseTo((1.0 - 10/49) * 100);
   });
 }); 
