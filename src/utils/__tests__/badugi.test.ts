@@ -1,15 +1,15 @@
-import { describe, it, suite, expect } from 'vitest'
-import { parseRange, calculateBadugiOdds, ALL_VALID_HANDS } from '../badugi'
-describe('ALL_VALID_HANDS', () => {
+import { describe, it, expect } from 'vitest'
+import { parseRange, calculateBadugiOdds, ALL_VALID_TRI_HANDS } from '../badugi'
+describe('ALL_VALID_TRI_HANDS', () => {
   it('数が正しい', () => {
-    expect(ALL_VALID_HANDS.length).toEqual(286);
+    expect(ALL_VALID_TRI_HANDS.length).toEqual(286);
   });
   it('すべての有効な3枚組み合わせを含む', () => {
-    expect(ALL_VALID_HANDS[0]).toEqual('A23');
-    expect(ALL_VALID_HANDS[1]).toEqual('A24');
-    expect(ALL_VALID_HANDS[2]).toEqual('A34');
-    expect(ALL_VALID_HANDS[ALL_VALID_HANDS.length - 2]).toEqual('TQK');
-    expect(ALL_VALID_HANDS[ALL_VALID_HANDS.length - 1]).toEqual('JQK');
+    expect(ALL_VALID_TRI_HANDS[0]).toEqual('A23');
+    expect(ALL_VALID_TRI_HANDS[1]).toEqual('A24');
+    expect(ALL_VALID_TRI_HANDS[2]).toEqual('A34');
+    expect(ALL_VALID_TRI_HANDS[ALL_VALID_TRI_HANDS.length - 2]).toEqual('TQK');
+    expect(ALL_VALID_TRI_HANDS[ALL_VALID_TRI_HANDS.length - 1]).toEqual('JQK');
   });
 });
 
