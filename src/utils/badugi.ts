@@ -26,7 +26,7 @@ function generateCombinations(ranks: Rank[]): string[] {
 }
 
 // すべての有効な3枚組み合わせをあらかじめ生成
-export const ALL_VALID_HANDS = (() => {
+export const ALL_VALID_TRI_HANDS = (() => {
   const ranks = Object.keys(RANK_ORDER) as Rank[];
   return generateCombinations(ranks).sort((a, b) => {
     for (let i = 2; i >= 0; i--) {
@@ -36,6 +36,29 @@ export const ALL_VALID_HANDS = (() => {
     return 0;
   });
 })();
+
+export const ALL_VALID_BADUGI_HANDS = (() => {
+  const ranks = Object.keys(RANK_ORDER) as Rank[];
+  const result: string[] = [];
+  for (let i = 0; i < ranks.length - 3; i++) {
+    for (let j = i + 1; j < ranks.length - 2; j++) {
+      for (let k = j + 1; k < ranks.length - 1; k++) {
+        for (let l = k + 1; l < ranks.length; l++) {
+          result.push(normalizeHand([ranks[i], ranks[j], ranks[k], ranks[l]]));
+        }
+      }
+    }
+  }
+  return result.sort((a, b) => {
+    for (let i = 3; i >= 0; i--) {
+      const diff = RANK_ORDER[a[i] as Rank] - RANK_ORDER[b[i] as Rank];
+      if (diff !== 0) return diff;
+    }
+    return 0;
+  });
+})();
+
+export const ALL_VALID_HANDS = [...ALL_VALID_BADUGI_HANDS, ...ALL_VALID_TRI_HANDS];
 
 // レンジ表記を解析して3枚の組み合わせの配列を返す
 export function parseRange(rangeStr: string): string[] {
@@ -49,9 +72,9 @@ export function parseRange(rangeStr: string): string[] {
       if (baseHand.length !== 3) continue;
       
       const normalizedBase = normalizeHand(baseHand.split('') as Rank[]);
-      const endIndex = ALL_VALID_HANDS.indexOf(normalizedBase);
+      const endIndex = ALL_VALID_TRI_HANDS.indexOf(normalizedBase);
       if (endIndex !== -1) {
-        ALL_VALID_HANDS.slice(0, endIndex + 1).forEach(h => result.add(h));
+        ALL_VALID_TRI_HANDS.slice(0, endIndex + 1).forEach(h => result.add(h));
       }
     } else {
       // 通常の3枚表記の処理
@@ -60,7 +83,7 @@ export function parseRange(rangeStr: string): string[] {
     }
   }
 
-  return Array.from(result).sort((a, b) => ALL_VALID_HANDS.indexOf(a) - ALL_VALID_HANDS.indexOf(b));
+  return Array.from(result).sort((a, b) => ALL_VALID_TRI_HANDS.indexOf(a) - ALL_VALID_TRI_HANDS.indexOf(b));
 }
 
 // バドゥギの確率を計算
