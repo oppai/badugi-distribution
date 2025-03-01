@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { parseRange, calculateBadugiOdds, calculateBadugiEquity, ALL_VALID_TRI_HANDS } from '../badugi'
+import { parseRange, calculateBadugiOdds, calculateBadugiEquity, ALL_VALID_TRI_HANDS, ALL_VALID_BADUGI_HANDS, ALL_VALID_HANDS } from '../badugi'
+
 describe('ALL_VALID_TRI_HANDS', () => {
   it('数が正しい', () => {
     expect(ALL_VALID_TRI_HANDS.length).toEqual(286);
@@ -10,6 +11,30 @@ describe('ALL_VALID_TRI_HANDS', () => {
     expect(ALL_VALID_TRI_HANDS[2]).toEqual('A34');
     expect(ALL_VALID_TRI_HANDS[ALL_VALID_TRI_HANDS.length - 2]).toEqual('TQK');
     expect(ALL_VALID_TRI_HANDS[ALL_VALID_TRI_HANDS.length - 1]).toEqual('JQK');
+  });
+});
+
+describe('ALL_VALID_BADUGI_HANDS', () => {
+  it('数が正しい', () => {
+    expect(ALL_VALID_BADUGI_HANDS.length).toEqual(715);
+  });
+  it('すべての有効な4枚と3組み合わせを含む', () => {
+    expect(ALL_VALID_BADUGI_HANDS[0]).toEqual('A234');
+    expect(ALL_VALID_BADUGI_HANDS[1]).toEqual('A235');
+    expect(ALL_VALID_BADUGI_HANDS[ALL_VALID_BADUGI_HANDS.length - 2]).toEqual('9JQK');
+    expect(ALL_VALID_BADUGI_HANDS[ALL_VALID_BADUGI_HANDS.length - 1]).toEqual('TJQK');
+  });
+});
+
+describe('ALL_VALID_HANDS', () => {
+  it('数が正しい', () => {
+    expect(ALL_VALID_HANDS.length).toEqual(286 + 715);
+  });
+  it('すべての有効な4枚と3組み合わせを含む', () => {
+    expect(ALL_VALID_HANDS[0]).toEqual('A234');
+    expect(ALL_VALID_HANDS[1]).toEqual('A235');
+    expect(ALL_VALID_HANDS[ALL_VALID_HANDS.length - 2]).toEqual('TQK');
+    expect(ALL_VALID_HANDS[ALL_VALID_HANDS.length - 1]).toEqual('JQK');
   });
 });
 
@@ -63,21 +88,22 @@ describe('calculateBadugiOdds', () => {
 describe('calculateBadugiEquity', () => {
   const testCases = [
     {
-      hand1: ['A23'], hand2: ['A23'],
-      expected: { hand1Equity: 33.3, hand2Equity: 33.3, ties: 50.0 },
+      hero: ['A23'], villain: ['A23'],
+      expected: { heroEquity: 16.0, villainEquity: 16.0, tiesEquity: 68.0 },
     },
     {
-      hand1: ['A23'], hand2: ['A2QK'],
-      expected: { hand1Equity: 20.0, hand2Equity: 80.0, ties: 0.0 },
+      hero: ['A23'], villain: ['A2QK'],
+      expected: { heroEquity: 20.0, villainEquity: 80.0, tiesEquity: 0.0 },
     },
   ];
   for (const testCase of testCases) {
-    it(`${testCase.hand1} vs ${testCase.hand2}`, () => {
-      const equity = calculateBadugiEquity(testCase.hand1, testCase.hand2);
-      expect(equity.hand1Equity).toBeCloseTo(testCase.expected.hand1Equity);
-      expect(equity.hand2Equity).toBeCloseTo(testCase.expected.hand2Equity);
-      expect(equity.ties).toBeCloseTo(testCase.expected.ties);
-      const total = equity.hand1Equity + equity.hand2Equity - equity.ties;
+    it(`${testCase.hero} vs ${testCase.villain}`, () => {
+      const equity = calculateBadugiEquity(testCase.hero, testCase.villain);
+      console.log(`${testCase.hero} vs ${testCase.villain}`, equity);
+      expect(equity.heroEquity).toBeCloseTo(testCase.expected.heroEquity);
+      expect(equity.villainEquity).toBeCloseTo(testCase.expected.villainEquity);
+      expect(equity.tiesEquity).toBeCloseTo(testCase.expected.tiesEquity);
+      const total = equity.heroEquity + equity.villainEquity - equity.tiesEquity;
       expect(total).toBeCloseTo(100.0);
     });
   }

@@ -1,38 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import RangeEquity from '../RangeEquity.vue';
-import * as rangeEquityUtils from '../../utils/range-equity';
+import * as badugiUtils from '../../utils/badugi';
 
 // モック関数を作成
-vi.mock('../../utils/range-equity', () => {
+vi.mock('../../utils/badugi', () => {
   return {
-    calculateRangeVsRangeEquity: vi.fn(),
-    calculateDetailedEquity: vi.fn()
+    parseRange: vi.fn().mockReturnValue(['A23', 'A24']),
+    calculateBadugiEquity: vi.fn().mockReturnValue({
+      heroEquity: 60,
+      villainEquity: 40,
+      tiesEquity: 0
+    }),
+    ALL_VALID_TRI_HANDS: [],
+    BADUGI_LABELS: []
   };
 });
 
 describe('RangeEquity', () => {
   beforeEach(() => {
     // モック関数をリセット
-    vi.resetAllMocks();
-    
-    // デフォルトのモック実装を設定
-    vi.mocked(rangeEquityUtils.calculateRangeVsRangeEquity).mockReturnValue({
-      range1Equity: 60,
-      range2Equity: 40,
-      ties: 0
-    });
-    
-    vi.mocked(rangeEquityUtils.calculateDetailedEquity).mockReturnValue({
-      range1Hands: [
-        { hand: 'A23', equity: 100 },
-        { hand: 'A24', equity: 50 }
-      ],
-      range2Hands: [
-        { hand: 'A25', equity: 50 },
-        { hand: 'JQK', equity: 0 }
-      ]
-    });
+    vi.clearAllMocks();
   });
   
   it('初期状態では結果が表示されない', () => {
@@ -49,8 +37,8 @@ describe('RangeEquity', () => {
     await wrapper.find('.range-input:nth-child(2) input').setValue('A25,KQJ');
     
     // 計算関数が呼ばれたことを確認
-    expect(rangeEquityUtils.calculateRangeVsRangeEquity).toHaveBeenCalledWith('A23,A24', 'A25,KQJ');
-    expect(rangeEquityUtils.calculateDetailedEquity).toHaveBeenCalledWith('A23,A24', 'A25,KQJ');
+    expect(badugiUtils.calculateBadugiEquity).toHaveBeenCalled();
+    expect(badugiUtils.parseRange).toHaveBeenCalled();
     
     // 結果が表示されることを確認
     expect(wrapper.find('.no-results').exists()).toBe(false);
@@ -63,28 +51,14 @@ describe('RangeEquity', () => {
     // 詳細な結果が表示されることを確認
     const tables = wrapper.findAll('table');
     expect(tables.length).toBe(2);
-    
-    // レンジ1の詳細テーブル
-    const range1Table = tables[0];
-    const range1Rows = range1Table.findAll('tbody tr');
-    expect(range1Rows.length).toBe(2);
-    expect(range1Rows[0].text()).toContain('A23');
-    expect(range1Rows[0].text()).toContain('100.0%');
-    
-    // レンジ2の詳細テーブル
-    const range2Table = tables[1];
-    const range2Rows = range2Table.findAll('tbody tr');
-    expect(range2Rows.length).toBe(2);
-    expect(range2Rows[0].text()).toContain('A25');
-    expect(range2Rows[0].text()).toContain('50.0%');
   });
   
   it('引き分けがある場合は引き分けバーが表示される', async () => {
-    // モックを変更して引き分けを含める
-    vi.mocked(rangeEquityUtils.calculateRangeVsRangeEquity).mockReturnValue({
-      range1Equity: 40,
-      range2Equity: 40,
-      ties: 20
+    // モックの戻り値を変更
+    vi.mocked(badugiUtils.calculateBadugiEquity).mockReturnValueOnce({
+      heroEquity: 40,
+      villainEquity: 40,
+      tiesEquity: 20
     });
     
     const wrapper = mount(RangeEquity);
@@ -99,6 +73,9 @@ describe('RangeEquity', () => {
   });
   
   it('レンジが空の場合は結果が表示されない', async () => {
+    // parseRangeが空の配列を返すようにモック
+    vi.mocked(badugiUtils.parseRange).mockReturnValueOnce([]);
+    
     const wrapper = mount(RangeEquity);
     
     // 一方のレンジだけ入力

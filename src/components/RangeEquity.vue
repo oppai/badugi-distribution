@@ -50,27 +50,27 @@
           <div class="equity-bar">
             <div 
               class="equity-bar-range1" 
-              :style="{ width: `${equity.range1Equity}%` }"
+              :style="{ width: `${equity.heroEquity}%` }"
             >
-              {{ equity.range1Equity.toFixed(1) }}%
+              {{ equity.heroEquity.toFixed(1) }}%
             </div>
             <div 
               class="equity-bar-ties" 
-              :style="{ width: `${equity.ties}%` }"
-              v-if="equity.ties > 0"
+              :style="{ width: `${equity.tiesEquity}%` }"
+              v-if="equity.tiesEquity > 0"
             >
-              {{ equity.ties.toFixed(1) }}%
+              {{ equity.tiesEquity.toFixed(1) }}%
             </div>
             <div 
               class="equity-bar-range2" 
-              :style="{ width: `${equity.range2Equity}%` }"
+              :style="{ width: `${equity.villainEquity}%` }"
             >
-              {{ equity.range2Equity.toFixed(1) }}%
+              {{ equity.villainEquity.toFixed(1) }}%
             </div>
           </div>
           <div class="equity-labels">
             <div>レンジ1</div>
-            <div v-if="equity.ties > 0">引き分け</div>
+            <div v-if="equity.tiesEquity > 0">引き分け</div>
             <div>レンジ2</div>
           </div>
         </div>
@@ -123,8 +123,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { parseRange } from '../utils/badugi';
-import { calculateRangeVsRangeEquity, calculateDetailedEquity } from '../utils/range-equity';
+import { parseRange, calculateBadugiEquity } from '../utils/badugi';
 
 interface DetailedEquity {
   range1Hands: { hand: string; equity: number }[];
@@ -140,9 +139,9 @@ export default defineComponent({
       range1Hands: [] as string[],
       range2Hands: [] as string[],
       equity: {
-        range1Equity: 0,
-        range2Equity: 0,
-        ties: 0
+        heroEquity: 0,
+        villainEquity: 0,
+        tiesEquity: 0
       },
       detailedEquity: {
         range1Hands: [],
@@ -165,8 +164,7 @@ export default defineComponent({
       }
     },
     calculateEquity() {
-      this.equity = calculateRangeVsRangeEquity(this.range1Input, this.range2Input);
-      this.detailedEquity = calculateDetailedEquity(this.range1Input, this.range2Input);
+      this.equity = calculateBadugiEquity(this.range1Hands, this.range2Hands);
     }
   }
 });
