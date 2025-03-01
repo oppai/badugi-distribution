@@ -119,4 +119,22 @@ export function calculateBadugiOdds(hands: string[], showTri: boolean = false): 
     odds.set(label, value / (remaining * hands.length) * 100);
   }
   return odds;
-} 
+}
+
+function internalCalcEquity(hand1: string, hand2: string, iterations: number = 100_000): { hand1Equity: number, hand2Equity: number, ties: number } {
+}
+
+export function calculateBadugiEquity(hand1: string[], hand2: string[], iterations: number = 10_000): { hand1Equity: number, hand2Equity: number, ties: number } {
+  const allHand1 = hand1.flatMap(h => parseRange(h));
+  const allHand2 = hand2.flatMap(h => parseRange(h));
+  const allUniqueHand1 = [...new Set(allHand1)];
+  const allUniqueHand2 = [...new Set(allHand2)];
+
+  for (let heroHand of allUniqueHand1) {
+    for (let villainHand of allUniqueHand2) {
+      const equity = internalCalcEquity(heroHand, villainHand, iterations);
+    }
+  }
+
+  return { hand1Equity, hand2Equity, ties };
+}
