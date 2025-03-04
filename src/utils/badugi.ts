@@ -41,9 +41,30 @@ export const ALL_VALID_HANDS = (() => {
 export function parseRange(rangeStr: string): string[] {
   const hands = rangeStr.split(',').map(h => h.trim());
   const result = new Set<string>();
+  const removeHands = new Set<string>();
 
-  for (const hand of hands) {
-    if (hand.endsWith('+')) {
+  for (let hand of hands) {
+    if (hand.startsWith('-')) {
+      // 括弧を削除
+      hand = hand.replace(/[\(\)]/g, '');
+
+      // マイナス表記の処理
+      if (hand.endsWith('+')) {
+        const baseHand = hand.slice(1, -1);
+        if (baseHand.length !== 3) continue;
+
+        const normalizedBase = normalizeHand(baseHand.split('') as Rank[]);
+        const endIndex = ALL_VALID_HANDS.indexOf(normalizedBase);
+        if (endIndex !== -1) {
+          ALL_VALID_HANDS.slice(0, endIndex + 1).forEach(h => removeHands.add(h));
+          console.log("removeHands", normalizedBase, removeHands);
+        }
+      } else {
+        const baseHand = hand.slice(1);
+        if (baseHand.length !== 3) continue;
+        removeHands.add(normalizeHand(baseHand.split('') as Rank[]));
+      }
+    } else if (hand.endsWith('+')) {
       // プラス表記の処理
       const baseHand = hand.slice(0, -1);
       if (baseHand.length !== 3) continue;
@@ -58,6 +79,10 @@ export function parseRange(rangeStr: string): string[] {
       if (hand.length !== 3) continue;
       result.add(normalizeHand(hand.split('') as Rank[]));
     }
+  }
+
+  for (const hand of removeHands) {
+    result.delete(hand);
   }
 
   return Array.from(result).sort((a, b) => ALL_VALID_HANDS.indexOf(a) - ALL_VALID_HANDS.indexOf(b));
