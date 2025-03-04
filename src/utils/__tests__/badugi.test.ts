@@ -65,6 +65,14 @@ describe('parseRange', () => {
     expect(parseRange('A23+,A23')).toEqual(['A23']);
   });
 
+  it('レンジから除去する', () => {
+    expect(parseRange('234+,-234')).toEqual(['A23', 'A24', 'A34']);
+    expect(parseRange('234+,-A34+')).toEqual(['234']);
+    expect(parseRange('234+,-(A24+)')).toEqual(['A34','234']);
+    expect(parseRange('234+,-A24,-A23+')).toEqual(['A34','234']);
+    expect(parseRange('234+,-A24,-A23,-A34')).toEqual(['234']);
+  });
+
   it('ソートされた結果を返す', () => {
     expect(parseRange('KQJ,A23')).toEqual(['A23', 'JQK']);
   });
